@@ -5,6 +5,12 @@
 	first_count = ($ - first_array) / TYPE first_array
 	first_summa dword ?
 
+	; Second ex
+	second_array sqword 1, -7, 0, 13, 2, -4
+	second_result_array sqword ?
+	second_el_size = TYPE second_array
+	second_count = ($ - second_array) / TYPE second_array
+
 .CODE
 	main PROC
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,6 +54,11 @@
 		mov first_summa, ecx
 
 	SKIP_FIRST:
+	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	; Second ex
+	; Дан массив целых чисел, содержащий n элементов. Получить массив, в
+	; котором записаны сначала все положительные числа, затем все отрица-
+	; тельные числа и нули, сохраняя порядок следования.
 		ret
 	main ENDP
 END
