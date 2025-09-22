@@ -11,7 +11,11 @@
 	second_el_size = TYPE second_array
 	second_result_array sqword ?, ?, ?, ?, ?, ?
 
-
+	; Third ex
+	third_array_2D qword 1, 4, 8
+	third_row_size = ($ - third_array_2D)
+				   qword 2, 7, 3
+				   qword 4, 6, 2
 .CODE
 	main PROC
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
