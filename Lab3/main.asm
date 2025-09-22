@@ -15,7 +15,7 @@
 	third_array_2D qword 1, 4, 8
 	third_row_size = ($ - third_array_2D)
 				   qword 2, 7, 3
-				   qword 4, 6, 2
+				   qword 4, 6, 7
 	third_total_size = ($ - third_array_2D)
 	third_el_size = TYPE third_array_2D
 
@@ -101,31 +101,38 @@
 	; Упорядочить строки матрицы по возрастанию их последних элементов.
 		; third_total_size / third_row_size - Количество строк
 		; third_row_size / third_el_size - Количество столбцов
+
 		lea rsi, third_array_2D
-
 		mov rax, third_total_size - third_row_size
-
-	L11:
+		
 		mov rcx, third_row_size / third_el_size
+	OUTER_CYCLE:
+		mov rax, third_total_size - third_row_size
+	INNER_CYCLE:
 		mov r8, [rsi +  rax  - third_el_size]				  ; последний элемент i строки
 		mov r9, [rsi + rax + third_row_size  - third_el_size] ; последний элемент i + 1 строки
+		mov rdx, rax ; копирую смещение на адрес i-го ряда
+		mov r10, third_row_size / third_el_size
 		cmp r8, r9
-		mov rdx, rax ; смещение на адрес i-го ряда
 		ja SWAP_ROW
-	NEXT_ROW:
+
+	TO_NEXT_ROW:
 		sub rax, third_row_size
 		test rax, rax
-		jnz L11
+		jnz INNER_CYCLE
+		loop OUTER_CYCLE
 		jmp SKIP_THIRD
 
 	SWAP_ROW:
-	; Тут нужно как-то поменять строки i и i + 1 матрицы
+		; Тут нужно как-то поменять строки i и i + 1 матрицы
 		mov r8, [rsi + rdx - third_row_size]  ; получили первый элемент i строки
 		xchg r8, [rsi +  rdx]				  ; поменяли первый элемент i + 1 строки
 		mov [rsi + rdx - third_row_size], r8  ; поменяли первый элемент i строки
 		add rdx, third_el_size
-		loop SWAP_ROW	
-		jmp NEXT_ROW
+		dec r10
+		test r10, r10
+		jnz SWAP_ROW	
+		jmp TO_NEXT_ROW
 
 	SKIP_THIRD:
 		ret
