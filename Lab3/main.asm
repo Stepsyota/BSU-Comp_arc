@@ -12,10 +12,11 @@
 	second_result_array sqword ?, ?, ?, ?, ?, ?
 
 	; Third ex
-	third_array_2D qword 1, 4, 8
+	third_array_2D qword 1, 4, 8, 15
 	third_row_size = ($ - third_array_2D)
-				   qword 2, 7, 3
-				   qword 4, 6, 7
+				   qword 2, 7, 3, 6
+				   qword 4, 6, 7, 13
+				   qword 12, 8, 4, 7
 	third_total_size = ($ - third_array_2D)
 	third_el_size = TYPE third_array_2D
 
@@ -103,8 +104,6 @@
 		; third_row_size / third_el_size - Количество столбцов
 
 		lea rsi, third_array_2D
-		mov rax, third_total_size - third_row_size
-		
 		mov rcx, third_row_size / third_el_size
 	OUTER_CYCLE:
 		mov rax, third_total_size - third_row_size
