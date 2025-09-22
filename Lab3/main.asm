@@ -16,6 +16,8 @@
 	third_row_size = ($ - third_array_2D)
 				   qword 2, 7, 3
 				   qword 4, 6, 2
+	third_el_size = TYPE third_array_2D
+
 .CODE
 	main PROC
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,11 +34,11 @@
 		push rcx ; сохранить счетчик внешнего цикла
 		lea rsi, first_array ; ESI указывает на первый элемент
 	L2: 
-		mov eax, [rsi] ; взять число из массива
+		mov rax, [rsi] ; взять число из массива
 		cmp [rsi+first_el_size], eax ; сравнить со следующим
 		jg L3 ; if ([ESI+4] > [ESI]) не обменивать
-		xchg eax,[rsi+first_el_size] ; обменять значения соседних
-		mov [rsi], eax ; элементов массива
+		xchg rax,[rsi+first_el_size] ; обменять значения соседних
+		mov [rsi], rax ; элементов массива
 	L3: 
 		add rsi,first_el_size ; cдвинуть указатель на следующий элемент
 		loop L2 ; внутренний цикл
@@ -50,12 +52,12 @@
 		mul rbx
 		add rsi, rax ; Получил последний элемент массива
 		
-		xor ecx, ecx
-		add ecx, [rsi]
+		xor rcx, rcx
+		add rcx, [rsi]
 		sub rsi, first_el_size
-		add ecx, [rsi]
+		add rcx, [rsi]
 		sub rsi, first_el_size
-		add ecx, [rsi]
+		add rcx, [rsi]
 		mov first_summa, ecx
 
 	SKIP_FIRST:
@@ -69,10 +71,10 @@
 		lea rsi, second_array
 		lea rdi, second_result_array
 	L5: ; Добавляем во второй массив только числа > 0
-		mov eax, [rsi]
-		cmp eax, 0
+		mov rax, [rsi]
+		cmp rax, 0
 		jle L6
-		mov [rdi], eax
+		mov [rdi], rax
 		add rdi, second_el_size
 	L6:
 		add rsi, second_el_size
@@ -83,10 +85,10 @@
 		mov rcx, second_count
 		lea rsi, second_array
 	L8:
-		mov eax, [rsi] ; movsx не работает!
-		cmp eax, 0
+		mov rax, [rsi] ; movsx не работает!
+		cmp rax, 0
 		jg L9
-		mov [rdi], eax
+		mov [rdi], rax
 		add rdi, second_el_size
 	L9:
 		add rsi, second_el_size
@@ -96,6 +98,9 @@
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	; Third ex
 	; Упорядочить строки матрицы по возрастанию их последних элементов.
+	lea rsi, third_array_2D
+	mov rax, [rsi + third_row_size * 0 + third_el_size * ((third_row_size / third_el_size) - 1)]
+
 		ret
 	main ENDP
 END
