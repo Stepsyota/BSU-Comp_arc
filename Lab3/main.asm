@@ -7,9 +7,10 @@
 
 	; Second ex
 	second_array sqword 1, -7, 0, 13, 2, -4
-	second_result_array sqword ?
-	second_el_size = TYPE second_array
 	second_count = ($ - second_array) / TYPE second_array
+	second_el_size = TYPE second_array
+	second_result_array sqword ?, ?, ?, ?, ?, ?
+
 
 .CODE
 	main PROC
@@ -59,6 +60,38 @@
 	; ƒан массив целых чисел, содержащий n элементов. ѕолучить массив, в
 	; котором записаны сначала все положительные числа, затем все отрица-
 	; тельные числа и нули, сохран€€ пор€док следовани€.
+
+		mov rcx, second_count
+		lea rsi, second_array
+		lea rdi, second_result_array
+	L5: ; ƒобавл€ем во второй массив только числа > 0
+		mov eax, [rsi]
+		cmp eax, 0
+		jle L6
+		mov [rdi], eax
+		add rdi, second_el_size
+	L6:
+		add rsi, second_el_size
+		loop L5
+		jmp L7
+
+	L7: ; ƒобавл€ем все остальные числа
+		mov rcx, second_count
+		lea rsi, second_array
+	L8:
+		mov eax, [rsi] ; movsx не работает!
+		cmp eax, 0
+		jg L9
+		mov [rdi], eax
+		add rdi, second_el_size
+	L9:
+		add rsi, second_el_size
+		loop L8
+		jmp L10
+	L10:
+	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	; Third ex
+	; ”пор€дочить строки матрицы по возрастанию их последних элементов.
 		ret
 	main ENDP
 END
