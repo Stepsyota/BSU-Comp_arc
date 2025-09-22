@@ -104,10 +104,13 @@
 		lea rsi, third_array_2D
 
 		mov rax, third_total_size - third_row_size
+
 	L11:
+		mov rcx, third_row_size / third_el_size
 		mov r8, [rsi +  rax  - third_el_size]				  ; последний элемент i строки
 		mov r9, [rsi + rax + third_row_size  - third_el_size] ; последний элемент i + 1 строки
 		cmp r8, r9
+		mov rdx, rax ; смещение на адрес i-го ряда
 		ja SWAP_ROW
 	NEXT_ROW:
 		sub rax, third_row_size
@@ -117,6 +120,11 @@
 
 	SWAP_ROW:
 	; Тут нужно как-то поменять строки i и i + 1 матрицы
+		mov r8, [rsi + rdx - third_row_size]  ; получили первый элемент i строки
+		xchg r8, [rsi +  rdx]				  ; поменяли первый элемент i + 1 строки
+		mov [rsi + rdx - third_row_size], r8  ; поменяли первый элемент i строки
+		add rdx, third_el_size
+		loop SWAP_ROW	
 		jmp NEXT_ROW
 
 	SKIP_THIRD:
