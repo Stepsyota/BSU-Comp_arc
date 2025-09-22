@@ -16,6 +16,7 @@
 	third_row_size = ($ - third_array_2D)
 				   qword 2, 7, 3
 				   qword 4, 6, 2
+	third_total_size = ($ - third_array_2D)
 	third_el_size = TYPE third_array_2D
 
 .CODE
@@ -98,9 +99,27 @@
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	; Third ex
 	; Упорядочить строки матрицы по возрастанию их последних элементов.
-	lea rsi, third_array_2D
-	mov rax, [rsi + third_row_size * 0 + third_el_size * ((third_row_size / third_el_size) - 1)]
+		; third_total_size / third_row_size - Количество строк
+		; third_row_size / third_el_size - Количество столбцов
+		lea rsi, third_array_2D
 
+		mov rax, third_total_size - third_row_size
+	L11:
+		mov r8, [rsi +  rax  - third_el_size]				  ; последний элемент i строки
+		mov r9, [rsi + rax + third_row_size  - third_el_size] ; последний элемент i + 1 строки
+		cmp r8, r9
+		ja SWAP_ROW
+	NEXT_ROW:
+		sub rax, third_row_size
+		test rax, rax
+		jnz L11
+		jmp SKIP_THIRD
+
+	SWAP_ROW:
+	; Тут нужно как-то поменять строки i и i + 1 матрицы
+		jmp NEXT_ROW
+
+	SKIP_THIRD:
 		ret
 	main ENDP
 END
