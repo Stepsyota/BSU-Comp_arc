@@ -8,7 +8,7 @@
 	; Second ex
 	k byte 7
 	l byte 3
-	m byte 2
+	m byte 1
 	n byte 2
 	p_r byte 0		; Pawn rook
 	r_p byte 0		; Rook pawn
@@ -19,8 +19,8 @@
 	summa qword ?
 
 	; Fourth ex
-	number_4 qword 84519432
-	k_4 qword 12
+	number_4 qword 845159432
+	k_4 qword 5
 	summa_f qword 0
 	summa_l qword 0
 	equal byte 0
@@ -99,13 +99,13 @@
 		; if (n > 8)
 		;	Неправильные координаты
 		cmp al, 8
-		jg SKIP
+		ja SKIP
 		cmp bl, 8
-		jg SKIP
+		ja SKIP
 		cmp cl, 8
-		jg SKIP
+		ja SKIP
 		cmp dl, 8
-		jg SKIP
+		ja SKIP
 		; if (k == 0)
 		;	Неправильные координаты
 		; if (l == 0)
@@ -197,8 +197,8 @@
 
 	mov rax, number_3
 	mov rbx, summa
-	mov rcx, 0
-	mov rdx, 0
+	mov rcx, 0 ; base
+	mov rdx, 0 ; rdx
 
 	do_while_3:
 		cmp rdx, rax
@@ -227,6 +227,7 @@
 	test r9, r9
 	jz EQUALLY
 
+	; Находим длину числа
 	; number_copy = number
 	; length_of_number = 1
 	; while(True):
@@ -256,12 +257,12 @@
 	; DIV, RAX / RBX, частное в RAX, остаток в RDX
 	; MUL, RAX * RBX
 	mov r13, 0		; i
-	mov rax, r8
+	mov rax, r8		; number_4
 	mov rbx, 10
 	Begin_while_4_1:
 		xor rdx, rdx
-		cmp r13, r9
-		jnl End_while_4_1
+		cmp r13, r9 ; i >= k_4
+		jnb End_while_4_1
 		div rbx
 		add r11, rdx
 		inc r13
@@ -273,9 +274,9 @@
 	; while (N > 0):
 	;	number_copy //= 10
 	;	N -= 1
-	mov r13, r10
-	sub r13, r9
-	mov rax, r8
+	mov r13, r10 ; length_of_number
+	sub r13, r9	 ; k_4
+	mov rax, r8	 ; number_4
 	mov rbx, 10
 	Begin_while_4_2:
 		xor rdx, rdx

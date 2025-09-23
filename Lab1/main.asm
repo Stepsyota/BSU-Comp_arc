@@ -1,14 +1,17 @@
 .DATA
 		; First ex
 		a sqword 10
-		b sqword 12
+		b sqword 36
 		c sqword 4
 		y sqword ?
-
-		d qword 2
-		T qword ?
-		S qword ?
-		res byte ?
+		
+		a_2 byte 0
+		b_2 byte 1
+		c_2 byte 1
+		d_2 byte 1
+		T byte ?
+		S byte ?
+		result byte ?
 
 
 		; Third ex
@@ -23,8 +26,9 @@
 		; a · c / 2
 		mov rax, a
 		mov rcx, c
-		imul rcx
+		imul rax,rcx
 		mov rcx, 2
+		mov rdx,0
 		idiv rcx
 		mov r10, rax
 
@@ -35,7 +39,7 @@
 		mov rcx, 2
 		idiv rcx
 
-		sbb r10, rax
+		sub r10, rax
 		mov y, r10
 
 		;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,54 +48,61 @@
 		; T = !(!a * b + c * !d)
 
 		; r10 = !a * b 
-		mov rax, a
-		not rax
-		and rax, b
-		mov r10, rax
+		mov al, a_2
+		not al
+		and al, 1
+		and al, b_2
+		mov r10b, al
 
 		; r11 = c * !d
-		mov rax, d
-		not rax
-		and rax, c
-		mov r11, rax
+		mov al, d_2
+		not al
+		and al, 1
+		and al, c_2
+		mov r11b, al
 		
 		; T = !(r10 + r11)
-		or r10, r11
-		not r10
-		mov T, r10
+		or r10b, r11b
+		not r10b
+		and r10b, 1
+		mov T, r10b
 
 
 		; S = (a + !b) * (!c + d)
 		; r10 = (a + !b)
-		mov rax, b
-		not rax
-		or rax, a
-		mov r10, rax
+		mov al, b_2
+		not al
+		and al, 1
+		or al, a_2
+		mov r10b, al
 
 		; r11 = (!c + d)
-		mov rax, c
-		not rax
-		or rax, d
-		mov r11, rax
+		mov al, c_2
+		not al
+		and al, 1
+		or al, d_2
+		mov r11b, al
 		
 		; S = r10 * r11
-		and r10, r11
-		mov S, r10
+		and r10b, r11b
+		mov S, r10b
 
-		mov r10, T
-		mov r11, S
-		cmp r10, r11
+		mov r10b, T
+		mov r11b, S
+
+		cmp r10b, r11b
 		sete al
-		mov res, al
+
+		mov result, al
 		;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		; Third ex
 		; Задано число n в формате signed int. Инвертировать биты 1, 7.
-		; n			= 0b00001001 01011000 01010001 10000111 = 156782983
-		; result	= 0b00001001 01011000 01010001 00000101 = 156782853
+		; n				= 0b00001001 01011000 01010001 10000111 = 156782983
+		; third_result	= 0b00001001 01011000 01010001 00000101 = 156782853
 
 		mov eax, n
-		xor eax, 130 ; 130 = 0b00000000 00000000 10000010
+		xor eax, 10000010b ; 130 = 0b00000000 00000000 10000010
 		mov n, eax
 		ret
 		;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
