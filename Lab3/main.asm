@@ -86,7 +86,7 @@
 		mov rcx, second_count
 		lea rsi, second_array
 	L8:
-		mov rax, [rsi] ; movsx не работает!
+		mov rax, [rsi]
 		cmp rax, 0
 		jg L9
 		mov [rdi], rax
