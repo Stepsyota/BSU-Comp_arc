@@ -1,9 +1,12 @@
-;  int64_t first_cosh(uint64_t x, uint64_t n);
+;  double sse_cosh(udouble x, double n);
 
 option casemap:none
 
+extern POW_SSE:PROC
+extern FACTORIAL:PROC
+
 .CODE
-	first_cosh PROC
+	sse_cosh PROC
 		; IN:
 		;	XMM0 - x
 		;	XMM1 - eps
@@ -17,7 +20,7 @@ option casemap:none
 		movsd xmm6, xmm0 ; eps
 		movsd xmm7, xmm1 ; eps
 		mov rdx, 0
-		call ITERATION
+		call ITERATION_SSE
 		movsd xmm2, xmm0 ; текущее значение
 		movsd xmm3, xmm2 ; значение следующей итерации
 		
@@ -26,7 +29,7 @@ option casemap:none
 	loop_start:
 		inc rdx
 		movsd xmm0, xmm6
-		call ITERATION
+		call ITERATION_SSE
 		addsd xmm3, xmm0	; i+1 значение
 		movsd xmm4, xmm0	
 		ucomisd xmm4, xmm7
@@ -36,9 +39,9 @@ option casemap:none
 	loop_end:
 		movsd xmm0, xmm3
 		ret
-	first_cosh ENDP
+	sse_cosh ENDP
 
-	ITERATION PROC
+	ITERATION_SSE PROC
 		; USES RCX RDX R8 XMM0 XMM1 XMM2
 		; IN:
 		;	XMM0 - x
@@ -49,7 +52,7 @@ option casemap:none
 		mov r8, rdx
 		imul rdx, 2
 		
-		CALL POW
+		CALL POW_SSE
 
 		movsd xmm2, xmm0 ; x^(2n)
 
@@ -62,60 +65,7 @@ option casemap:none
 		movsd xmm0, xmm2
 		mov rdx, r8
 		ret
-	ITERATION ENDP
-
-	FACTORIAL PROC
-		; USES RAX RCX
-		; IN:
-		;	RCX - n
-		; OUT: 
-		;	RAX - result
-		test rcx, rcx
-		jz case_0
-
-		mov rax, rcx
-		dec rcx
-		jz loop_end
-	loop_start:
-		mul rcx
-		dec rcx
-		jnz loop_start
-	loop_end:
-		ret
-
-	case_0:
-		mov rax, 1
-		ret
-	FACTORIAL ENDP
-
-	POW PROC
-		; USES RCX RDX XMM0 XMM1
-		; IN:
-		;	XMM0 - x
-		;	RDX - n
-		; OUT: 
-		;	XMM0 - result
-
-		test rdx, rdx
-		jz case_0
-
-		mov rcx, rdx
-		dec rcx
-		jz loop_end
-
-		movsd xmm1, xmm0
-	loop_start:
-		mulsd xmm0, xmm1
-		dec rcx
-		jnz loop_start
-	loop_end:
-		ret
-
-	case_0:
-		mov rcx, 1
-		cvtsi2sd xmm0, rcx
-		ret
-	POW ENDP
+	ITERATION_SSE ENDP
 END
 
 ; Third ex

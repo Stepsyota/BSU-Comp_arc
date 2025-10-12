@@ -127,7 +127,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="5_1.asm">
+    <MASM Include="avx.asm" />
+    <MASM Include="factorial.asm" />
+    <MASM Include="pow_avx.asm" />
+    <MASM Include="pow_sse.asm" />
+    <MASM Include="sse.asm">
       <FileType>Document</FileType>
     </MASM>
   </ItemGroup>
