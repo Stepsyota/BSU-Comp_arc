@@ -1,4 +1,4 @@
-;  double fma_poly(double x, int n);
+;  double fma_poly(double x, int n)
 
 option casemap:none
 
@@ -13,6 +13,7 @@ extern POW_AVX:PROC
 		; OUT: 
 		;	XMM0 - result
 		; y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
+		; y = 10 + x * [1 + x? * (-3 + x? * (5 + x? * (-7 + ...)))]
 
 			test rdx, rdx
 			jz fma_error
@@ -53,19 +54,38 @@ extern POW_AVX:PROC
 		;	RDX - k (текущая итерация)
 		; OUT: 
 		;	XMM0 - result
+		; (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1)
+	
+			mov r10, rdx	; temp rdx
+
+			; (2k - 1)
+			mov r11, rdx
+			mov rax, 2
+			mul r11
+			inc rax
+			xchg r11, rax
+
+			mov rdx, r11
+			CALL POW_AVX
+
 			mov rax, rdx
-			mov r10, rdx
-			div 2
+			xchg rax, rdx
+			div rdx
 			test rdx, rdx
 			jz even_iter
 			jmp odd_iter
 
 		even_iter:
 			; pow(-1, k + 1) == -1
+			imul r11, -1
+			vcvtsi2sd xmm1, xmm1, rdx
+			vmulsd xmm0, xmm0, xmm1
 			ret
 
 		odd_iter:
 			; pow(-1, k + 1) == 1
+			vcvtsi2sd xmm1, xmm1, rdx
+			vmulsd xmm0, xmm0, xmm1
 			ret
 
 			ret
