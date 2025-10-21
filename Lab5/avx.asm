@@ -67,6 +67,3 @@ extern FACTORIAL:PROC
 		ret
 	ITERATION_AVX ENDP
 END
-
-; Third ex
-; y = 10 + sum from k = 1 to n of ( -1^(k + 1) * (2k - 1) * x^(2k - 1) )

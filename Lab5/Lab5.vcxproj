@@ -129,6 +129,7 @@
   <ItemGroup>
     <MASM Include="avx.asm" />
     <MASM Include="factorial.asm" />
+    <MASM Include="fma.asm" />
     <MASM Include="pow_avx.asm" />
     <MASM Include="pow_sse.asm" />
     <MASM Include="sse.asm">
