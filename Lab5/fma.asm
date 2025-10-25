@@ -13,37 +13,16 @@ extern POW_AVX:PROC
 		; OUT: 
 		;	XMM0 - result
 		; y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
-		; y = 10 + x * [1 + x? * (-3 + x? * (5 + x? * (-7 + ...)))]
+		; y = 10 + (+ or -)(2k - 1) * x^(2k - 1)
 
-			test rdx, rdx
-			jz fma_error
-			
-			mov rcx, 1
-			xchg rcx, rdx ; ¬ RCX - n (кол-во итераций), в RDX - 1 (номер текущей итерации)
+			vmovmsd xmm1, xmm0, xmm0 ; xmm1 содержит x
+			vmovmsd xmm0, 0 ; будет содержать результат
+			mov r10, rdx ; n
+			mov rdx, 1 ; rdx содержит текущую итерацию
 
-			vmovsd xmm6, xmm0, xmm0 ; значение x
-			vxorps xmm7, xmm7, xmm7 ; будет хранитьс€ сумма итераций
+			test rdx, 1
 
-			CALL FMA_ITER
-			vmovsd xmm7, xmm7, xmm0 ; перва€ итераци€
 
-			loop_start:
-				inc rdx
-				vmovsd xmm0, xmm6, xmm6
-				call FMA_ITER
-				vaddsd xmm7, xmm7, xmm0
-				cmp rdx, rcx
-				jae loop_end
-				jmp loop_start
-
-			loop_end:
-				vmovsd xmm0, xmm6, xmm6
-				mov eax, 10
-				vcvtsi2sd xmm6, xmm6, eax
-				vaddsd xmm0, xmm0, xmm6
-				ret
-
-			fma_error:
 				ret
 	fma_poly ENDP
 
