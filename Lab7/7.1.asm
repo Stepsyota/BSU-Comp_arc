@@ -4,41 +4,31 @@
 
 option casemap:none
 
-.DATA
-    ALIGN 16
-        A sdword 2, 2, 5, -1
-        B sdword -4, 1, 2, 8
-        C sdword ?, ?, ?, ?
-        n = ($ - A) / TYPE A
-        one dword 4 DUP(1)
+DataSeg SEGMENT ALIGN(32)
+        A sdword 2, 2, 5, -1, 6, 4, -2, 1
+        B sdword -4, 1, 2, 8, 8, 12, -5, 0
+        C sdword 8 DUP(?)
+        one dword 8 DUP(1)
 
 .CODE
     task7_1 PROC
 
-    movdqa xmm0, xmmword ptr [A]            ; xmm0 = A
-    movdqa xmm1, xmmword ptr [B]            ; xmm1 = B
+    vmovdqa ymm0, ymmword ptr [A]                  ; ymm0 = A
+    vmovdqa ymm1, ymmword ptr [B]                  ; ymm1 = B
 
-    movdqa xmm2, xmm0                       ; A
+    vpand ymm2, ymm0, ymmword ptr [one]            ; ymm2 = A[i] & 1 (0 Ч четное, 1 Ч нечетное)
 
-    movdqa xmm3, xmmword ptr [one]          ; [1, 1, 1, 1]
-    pand xmm2, xmm3                         ; xmm2 = A[i] & 1 (0 Ч четное, 1 Ч нечетное)
+    vpaddd ymm3, ymm0, ymm1                        ; ymm3 = A + B
+    vpsubd ymm4, ymm0, ymm1                        ; ymm4 = A - B
 
-    movdqa xmm4, xmm0                       ; A
-    paddd xmm4, xmm1                        ; xmm4 = A + B
+    vpcmpeqd ymm5, ymm2, ymmword ptr [one]         ; ymm5 = дл€ нечетных = 11...1, дл€ четных = 00...0
 
-    movdqa xmm5, xmm0                       ; A
-    psubd xmm5, xmm1                        ; xmm5 = A - B
+    ; ≈сли четное берем из ymm4 (A+B), иначе из ymm5 (A-B)
+    vpand ymm6, ymm5, ymm4                         ; ymm6 = (A-B) дл€ нечЄтных
+    vpandn ymm7, ymm5, ymm3                        ; ymm7 = (A+B) дл€ чЄтных
+    vpor ymm6, ymm6, ymm7                          ; ymm7 = результат
 
-    pxor xmm6, xmm6
-    pcmpeqd xmm6, xmm2                      ; xmm6 = дл€ четных = 11...1, дл€ нечетных = 00...0
-
-    ; ≈сли четное берем из xmm4 (A+B), иначе  из xmm5 (A-B)
-    movdqa xmm7, xmm6
-    pand xmm7, xmm4                         ; xmm7 = (A+B) дл€ чЄтных
-    pandn xmm6, xmm5                        ; xmm6 = (A-B) дл€ нечЄтных
-    por xmm7, xmm6                          ; xmm7 = результат
-
-    movdqa xmmword ptr [C], xmm7
+    vmovdqa ymmword ptr [C], ymm6
 
     lea rax, [C]
     ret

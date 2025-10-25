@@ -38,12 +38,12 @@ int main() {
     return 0;
 }
 void test7_1() {
-    int A[] = { 2, 2, 5, -1 };
-    int B[] = { -4, 1, 2, 8 };
-    int C[4];
+    int A[] = { 2, 2, 5, -1, 6, 4, -2, 1 };
+    int B[] = { -4, 1, 2, 8, 8, 12, -5, 0 };
+    int C[8];
     int* C_6_1 = task7_1();
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 8; ++i) {
         if (A[i] % 2 == 0) {
             C[i] = A[i] + B[i];
         }
