@@ -1,16 +1,16 @@
 /*
-6.1 ¬ыполнить индивидуальный вариант задани€ использу€ векторные операции SSE.
+7.1 ¬ыполнить индивидуальный вариант задани€ использу€ векторные операции AVX.
 ƒл€ заданных массивов A, B и C дл€ каждого i, если A[i] четное, C[i] := A[i] + B[i],
 иначе C[i] := A[i] Ц B[i].
 
 
-6.2 ¬ыполнить задани€ использу€ операции SSE дл€ упакованных чисел с плавающей точкой.
+7.2 ¬ыполнить задани€ использу€ операции AVX дл€ упакованных чисел с плавающей точкой.
 Ќормировать заданный вектор x, т. е. разделить каждый его элемент на длину вектора
 |x| = sqrt(sigma from k = 1 to n of pow(x_k, 2)
 
 
-6.3 ¬ычислить значение многочлена заданного пор€дка n по схеме √орнера во всех точках
-вектора x, использу€ операции SSE дл€ упакованных чисел с плавающей точкой.
+7.3 ¬ычислить значение многочлена заданного пор€дка n по схеме √орнера во всех точках
+вектора x, использу€ операции AVX/FMA дл€ упакованных чисел с плавающей точкой.
 y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
 */
 
@@ -22,12 +22,12 @@ using namespace std;
 
 extern "C" {
     int* task7_1();
-    float* task7_2();
+    double* task7_2();
     float* task7_3(int n = 1);
 }
 void test7_1();
 void test7_2();
-void norm_vector(float[]);
+void norm_vector(double[]);
 void test7_3(int = 1);
 float poly(float, int);
 
@@ -57,11 +57,11 @@ void test7_1() {
     cout << endl;
 }
 void test7_2() {
-    float* X = task7_2();
-    float X_math[] = { 2.0, -3.2, 4.2, 10.2 };
+    double* X = task7_2();
+    double X_math[] = { 2.0, -3.2, 4.2, 10.2 };
     norm_vector(X_math);
-    float sum_X = 0;
-    float sum_X_math = 0;
+    double sum_X = 0;
+    double sum_X_math = 0;
     for (int i = 0; i < 4; ++i) {
         cout << fixed << setprecision(10) << "X[" << i << "] ASM/MATH.H = " << X[i] << "/" << X_math[i];
         if (round((X[i] - X_math[i]) * 10000) == 0) {
@@ -73,13 +73,13 @@ void test7_2() {
     }
     cout << "Length of vector ASM/MATH.H = " << sqrt(sum_X) << "/" << sqrt(sum_X_math) << endl << endl;
 }
-void norm_vector(float X[]) {
-    float summ = 0;
+void norm_vector(double X[]) {
+    double summ = 0;
     for (int i = 0; i < 4; ++i) {
         summ += pow(X[i], 2);
     }
-    float sqrt_summ = sqrt(summ);
-    float X_norm[4];
+    double sqrt_summ = sqrt(summ);
+    double X_norm[4];
     for (int i = 0; i < 4; ++i) {
         X[i] /= sqrt_summ;
     }

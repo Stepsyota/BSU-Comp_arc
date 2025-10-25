@@ -3,26 +3,25 @@
 
 option casemap:none
 
-.DATA
-	ALIGN 16
-	X real4 2.0, -3.2, 4.2, 10.2
-	X_res real4 4 DUP(?)
+DataSeg SEGMENT ALIGN(32)
+	X real8 2.0, -3.2, 4.2, 10.2
+	X_res real8 4 DUP(?)
 
 .CODE
 	task7_2 PROC
-		movaps xmm0, [X]
-		movaps xmm1, xmm0	; X
-		movaps xmm2, xmm0	; X
+		vmovapd ymm0, ymmword ptr [X]		; X
+		vmulpd ymm1, ymm0, ymm0				; X^2
 
-		mulps xmm2, xmm2	; X^2
-		; Горизонтальное суммирование xmm2 = [ f3| f2| f1| f0]
-		haddps xmm2, xmm2 ; xmm2 = [f3+f2|f1+f0|f3+f2|f1+f0]
-		haddps xmm2, xmm2 ; xmm2 = [ sum| sum| sum| sum]
+		; ymm1 = [ a1 | a2 | a3 | a4 ]
+		vextractf128 xmm2, ymm1, 1          ; [ a3 | a4]
+		vaddpd xmm1, xmm1, xmm2             ; [ a1 + a3 | a2 + a4 ]
+		vhaddpd xmm1, xmm1, xmm1            ; [ a1 + a3 + a2 + a4 | a2 + a4 + a1 + a3 ]
 
-		sqrtps xmm2, xmm2
+		vsqrtpd xmm1, xmm1
+		vbroadcastsd ymm1, xmm1
 
-		divps xmm1, xmm2
-		movaps X_res, xmm1
+		vdivpd ymm2, ymm0, ymm1
+		vmovapd ymmword ptr [X_res], ymm2
 		lea rax, [X_res]
 		ret
 	task7_2 ENDP
