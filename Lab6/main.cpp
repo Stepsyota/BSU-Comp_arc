@@ -21,18 +21,20 @@ y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
 using namespace std;
 
 extern "C" {
-    //void task6_1(double* A, double *B, double *C, int size);
-    //void task6_2(double* x, int n);
     int* task6_1();
+    float* task6_2();
     float* task6_3(int n = 1);
 }
 void test6_1();
+void test6_2();
+void norm_vector(float[]);
 void test6_3(int = 1);
 float poly(float, int);
 
 int main() {
     test6_1();
-    //test6_3();
+    test6_2();
+    test6_3();
     return 0;
 }
 void test6_1() {
@@ -52,6 +54,35 @@ void test6_1() {
         }
         else cout << "\tNOT EQUAL!\n";
     }
+    cout << endl;
+}
+void test6_2() {
+    float* X = task6_2();
+    float X_math[] = {2.0, -3.2, 4.2, 10.2};
+    norm_vector(X_math);
+    float sum_X = 0;
+    float sum_X_math = 0;
+    for (int i = 0; i < 4; ++i) {
+        cout << fixed << setprecision(10) << "X[" << i << "] ASM/MATH.H = " << X[i] << "/" << X_math[i];
+        if (round((X[i] - X_math[i]) * 10000) == 0) {
+            cout << "\tEQUAL!\n";
+        }
+        else cout << "\tNOT EQUAL!\n";
+        sum_X += pow(X[i], 2);
+        sum_X_math += pow(X_math[i], 2);
+    }
+    cout << "Length of vector ASM/MATH.H = " << sqrt(sum_X) << "/" << sqrt(sum_X_math) << endl << endl;
+}
+void norm_vector(float X[]) {
+    float summ = 0;
+    for (int i = 0; i < 4; ++i) {
+        summ += pow(X[i], 2);
+    }
+    float sqrt_summ = sqrt(summ);
+    float X_norm[4];
+    for (int i = 0; i < 4; ++i) {
+        X[i] /= sqrt_summ;
+    }
 }
 void test6_3(int n) {
     float x[] = { 1.3, 2.4, 6.8, 7.2 };
@@ -65,6 +96,7 @@ void test6_3(int n) {
         }
         else cout << " NOT EQUAL!\n";
     }
+    cout << endl;
 }
 float poly(float x, int n = 1) {
     float res = 0;
