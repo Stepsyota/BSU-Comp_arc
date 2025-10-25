@@ -4,10 +4,45 @@
 
 using namespace std;
 
+void test_fma(double, int);
+double poly(double, int);
+
 extern "C" {
     double sse_cosh(double x, double eps = 1e-6);
     double avx_cosh(double x, double eps = 1e-6);
     double fma_poly(double x, int n = 1);
+}
+
+int main() {
+    double x = 1.1;
+    double eps = 1e-6;
+    int n = 3;
+    cout << fixed << setprecision(15);
+    //cout << "0. cosh(x) by math.h = \t" << cosh(x) << endl;
+    //cout << "1. cosh(x) by SSE    = \t" << sse_cosh(x, eps) << endl;
+    //cout << "2. cosh(x) by AVX    = \t" << avx_cosh(x, eps) << endl;
+    cout << "3. polynomial by math.h    = \t" << poly(1, n) << endl;
+    cout << "4. polynomial by FMA       = \t" << fma_poly(1, n) << endl;
+    test_fma(x, 10);
+    return 0;
+}
+
+void test_fma(double x, int n = 10) {
+    int counter = 0;
+    double res_poly, res_fma_poly;
+    for (int i = 1; i < n; ++i) {
+        res_poly = poly(x, i);
+        res_fma_poly = fma_poly(x, i);
+        double diff = round((res_poly - res_fma_poly) * 10000);
+        if (diff != 0) {
+            ++counter;
+            cout << "When n = " << i << ": poly = " << res_poly << ", fma_poly = " << res_fma_poly << ".\n";
+        }
+    }
+    if (counter) {
+        cout << "Test was failed!\n";
+    }
+    else cout << "Test was passes!\n";
 }
 
 double poly(double x, int n = 1) {
@@ -18,16 +53,4 @@ double poly(double x, int n = 1) {
         res += sigma;
     }
     return res;
-}
-int main() {
-    double x = 1.1;
-    double eps = 1e-6;
-    cout << fixed << setprecision(15);
-    //cout << "0. cosh(x) by math.h = \t" << cosh(x) << endl;
-    //cout << "1. cosh(x) by SSE    = \t" << sse_cosh(x, eps) << endl;
-    //cout << "2. cosh(x) by AVX    = \t" << avx_cosh(x, eps) << endl;
-    cout << "3. polynomial by math.h    = \t" << poly(1) << endl;
-    cout << "4. polynomial by FMA       = \t" << fma_poly(1) << endl;
-
-    return 0;
 }

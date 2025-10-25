@@ -3,6 +3,8 @@
 option casemap:none
 
 extern POW_AVX:PROC
+.DATA
+    ten real8 10.0
 
 .CODE
 	fma_poly PROC
@@ -13,60 +15,54 @@ extern POW_AVX:PROC
 		; OUT: 
 		;	XMM0 - result
 		; y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
-		; y = 10 + (+ or -)(2k - 1) * x^(2k - 1)
+		; y = y + (+ or -)(2k - 1) * x^(2k - 1)
 
-			vmovmsd xmm1, xmm0, xmm0 ; xmm1 содержит x
-			vmovmsd xmm0, 0 ; будет содержать результат
-			mov r10, rdx ; n
-			mov rdx, 1 ; rdx содержит текущую итерацию
+        vmovsd xmm1, xmm1, xmm0             ; xmm1 = x
+        vmovsd xmm6, qword ptr [ten]        ; xmm5 = y = 10.0
 
-			test rdx, 1
+        mov r8, rdx                        ; r8 = n (кол-во итераций)
+        mov r9, 1                          ; r9 = k = 1
 
+loop_start:
+        cmp r9, r8
+        jg loop_end                        ; если k > n - конец цикла
 
-				ret
-	fma_poly ENDP
+        ; R11 = sign = (-1)^(k+1)
+        mov r10, r9
+        add r10, 1
+        test r10, 1
+        jz sign_pos
+        mov r11, -1
+        jmp sign_ready
+sign_pos:
+        mov r11, 1
+sign_ready:
 
-	FMA_ITER PROC
-		; USES XMM0 RDX
-		; IN:
-		;	XMM0 - x
-		;	RDX - k (текущая итерация)
-		; OUT: 
-		;	XMM0 - result
-		; (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1)
-	
-			mov r10, rdx	; temp rdx
+        ; RAX = (2k - 1)
+        mov rax, r9
+        imul rax, 2
+        sub rax, 1                        
 
-			; (2k - 1)
-			mov r11, rdx
-			mov rax, 2
-			mul r11
-			inc rax
-			xchg r11, rax
+        ; XMM4 = pow(x, 2k - 1)
+        mov rdx, rax                       ; rdx = (2k - 1)
+        vmovsd xmm0, xmm1, xmm1            ; xmm2 = x
+        call POW_AVX                       ; XMM0 = x^(2k - 1)
+        vmovsd xmm4, xmm4, xmm0            ; XMM44 = pow(x, 2k - 1)
 
-			mov rdx, r11
-			CALL POW_AVX
+        ; xmm3 = sign * (2k - 1) = r11 * rax
+        vcvtsi2sd xmm2, xmm2, rax          ; xmm2 = (2k - 1)
+        vcvtsi2sd xmm5, xmm5, r11          ; xmm5 = sign
+        vmulsd xmm3, xmm2, xmm5      ; xmm3 = xmm2 * xmm5
 
-			mov rax, rdx
-			xchg rax, rdx
-			div rdx
-			test rdx, rdx
-			jz even_iter
-			jmp odd_iter
+        ; y = y + xmm3 * xmm4
+        vfmadd231sd xmm6, xmm3, xmm4       ; xmm0 = (xmm3 * xmm4) + xmm6
 
-		even_iter:
-			; pow(-1, k + 1) == -1
-			imul r11, -1
-			vcvtsi2sd xmm1, xmm1, rdx
-			vmulsd xmm0, xmm0, xmm1
-			ret
+        ; k += 1
+        inc r9
+        jmp loop_start
 
-		odd_iter:
-			; pow(-1, k + 1) == 1
-			vcvtsi2sd xmm1, xmm1, rdx
-			vmulsd xmm0, xmm0, xmm1
-			ret
-
-			ret
-	FMA_ITER ENDP
+loop_end:
+        vmovsd xmm0, xmm6, xmm6
+        ret
+    fma_poly ENDP
 END
