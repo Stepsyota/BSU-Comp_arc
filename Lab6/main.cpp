@@ -23,23 +23,41 @@ using namespace std;
 extern "C" {
     //void task6_1(double* A, double *B, double *C, int size);
     //void task6_2(double* x, int n);
+    int* task6_1();
     float* task6_3(int n = 1);
-    int get_length6_3();
 }
+void test6_1();
 void test6_3(int = 1);
 float poly(float, int);
 
 int main() {
-    test6_3();
+    test6_1();
+    //test6_3();
     return 0;
 }
+void test6_1() {
+    int A[] = { 2, 2, 5, -1 };
+    int B[] = { -4, 1, 2, 8 };
+    int C[4];
+    int* C_6_1 = task6_1();
 
+    for (int i = 0; i < 4; ++i) {
+        if (A[i] % 2 == 0) {
+            C[i] = A[i] + B[i];
+        }
+        else C[i] = A[i] - B[i];
+        cout << "A[" << i << "] = " << A[i] << ",\tB[" << i << "] = " << B[i] << ",\tC[" << i << "] ASM/Theor = " << C_6_1[i] << "/" << C[i];
+        if (C_6_1[i] - C[i] == 0) {
+            cout << "\tEQUAL!\n";
+        }
+        else cout << "\tNOT EQUAL!\n";
+    }
+}
 void test6_3(int n) {
     float x[] = { 1.3, 2.4, 6.8, 7.2 };
     float* x_res = task6_3(n);
-    int x_len = get_length6_3();
 
-    for (int i = 0; i < x_len; ++i) {
+    for (int i = 0; i < 4; ++i) {
         float x_poly = poly(x[i], n);
         cout << fixed << setprecision(10) << "X" << i << " by ASM/FUNC = " << x_res[i] << "/" << x_poly;
         if (round((x_res[i] - x_poly) * 10000) == 0) {

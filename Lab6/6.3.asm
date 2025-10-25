@@ -74,13 +74,6 @@ loop_end:
         ret
     task6_3 ENDP
 
-
-    get_length6_3 PROC
-        mov rax, array1_length
-            ret
-    get_length6_3 ENDP
-
-
 	POW_SSE PROC
 		; USES RCX RDX XMM0 XMM1
 		; IN:
