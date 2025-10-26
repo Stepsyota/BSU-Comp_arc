@@ -23,18 +23,18 @@ using namespace std;
 extern "C" {
     int* task7_1();
     double* task7_2();
-    float* task7_3(int n = 1);
+    double* task7_3(int n = 1);
 }
 void test7_1();
 void test7_2();
 void norm_vector(double[]);
 void test7_3(int = 1);
-float poly(float, int);
+double poly(double, int);
 
 int main() {
     test7_1();
     test7_2();
-    test7_3();
+    test7_3(5);
     return 0;
 }
 void test7_1() {
@@ -79,30 +79,29 @@ void norm_vector(double X[]) {
         summ += pow(X[i], 2);
     }
     double sqrt_summ = sqrt(summ);
-    double X_norm[4];
     for (int i = 0; i < 4; ++i) {
         X[i] /= sqrt_summ;
     }
 }
 void test7_3(int n) {
-    float x[] = { 1.3, 2.4, 6.8, 7.2 };
-    float* x_res = task7_3(n);
+    double x[] = { 1.3, 2.4, 6.8, 7.2 };
+    double* x_res = task7_3(n);
 
     for (int i = 0; i < 4; ++i) {
-        float x_poly = poly(x[i], n);
+        double x_poly = poly(x[i], n);
         cout << fixed << setprecision(10) << "X" << i << " by ASM/FUNC = " << x_res[i] << "/" << x_poly;
-        if (round((x_res[i] - x_poly) * 10000) == 0) {
+        if (round((x_res[i] - x_poly) * 10e5) == 0) {
             cout << " EQUAL!\n";
         }
         else cout << " NOT EQUAL!\n";
     }
     cout << endl;
 }
-float poly(float x, int n = 1) {
-    float res = 0;
+double poly(double x, int n = 1) {
+    double res = 0;
     res += 10;
     for (int k = 1; k <= n; ++k) {
-        float sigma = pow(-1, k + 1) * (2 * k - 1) * pow(x, 2 * k - 1);
+        double sigma = pow(-1, k + 1) * (2 * k - 1) * pow(x, 2 * k - 1);
         res += sigma;
     }
     return res;

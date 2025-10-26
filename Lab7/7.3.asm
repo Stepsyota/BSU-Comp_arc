@@ -3,13 +3,12 @@
 
 option casemap:none
 
-.DATA
-    ALIGN 16
-        one real4 1.0, 1.0, 1.0, 1.0
-        ten real4 10.0, 10.0, 10.0, 10.0
-        array1 real4 1.3, 2.4, 6.8, 7.2
+DataSeg SEGMENT ALIGN(32)
+        one real8 1.0, 1.0, 1.0, 1.0
+        ten real8 10.0, 10.0, 10.0, 10.0
+        array1 real8 1.3, 2.4, 6.8, 7.2
         array1_length = ($ - array1) / TYPE array1
-        res_arr1 real4 ?, ?, ?, ?  
+        res_arr1 real8 ?, ?, ?, ?  
 
 .CODE
 	task7_3 PROC
@@ -21,8 +20,8 @@ option casemap:none
 		; y = 10 + sigma from k = 1 to n of (pow(-1, k + 1) * (2k - 1) * pow(x, 2k - 1))
 		; y = y + (+ or -)(2k - 1) * x^(2k - 1)
 
-        movaps xmm1, [array1]          ; xmm1 = x
-        movaps xmm6, [ten]             ; xmm5 = y = 10.0
+        vmovapd ymm1, ymmword ptr [array1]          ; ymm1 = x
+        vmovapd ymm6, ymmword ptr [ten]             ; ymm6 = y = 10.0
 
         mov r8, rcx                        ; r8 = n (кол-во итераций)
         mov r9, 1                          ; r9 = k = 1
@@ -42,39 +41,39 @@ sign_pos:
         mov r11, 1
 sign_ready:
 
-        ; EAX = (2k - 1)
-        mov eax, r9d
-        imul eax, 2
-        sub eax, 1                        
+        ; RAX = (2k - 1)
+        mov rax, r9
+        imul rax, 2
+        sub rax, 1                        
 
-        ; XMM4 = pow(x, 2k - 1)
-        mov rdx, rax                       ; rdx = (2k - 1)
-        movaps xmm0, xmm1                   ; xmm2 = x
-        call POW_SSE                       ; XMM0 = x^(2k - 1)
-        movaps xmm4, xmm0                   ; XMM4 = pow(x, 2k - 1)
+        ; YMM0 = pow(x, 2k - 1)
+        mov rdx, rax                        ; rdx = (2k - 1)
+        vmovapd ymm0, ymm1                  ; ymm0 = x
+        call POW_AVX                        ; ymm0 = x^(2k - 1)
 
-        ; xmm3 = sign * (2k - 1) = r11d * eax
-        cvtsi2ss xmm2, eax          ; xmm2 = (2k - 1)
-        shufps xmm2, xmm2, 0       ; [a,a,a,a]
-        cvtsi2ss xmm3, r11d          ; xmm3 = sign
-        shufps xmm3, xmm3, 0    ; [a,a,a,a]
-        mulps xmm3, xmm2      ; xmm3 = xmm3 * xmm2
+        ; ymm3 = sign * (2k - 1) = r11d * eax
+        vcvtsi2sd xmm2, xmm2, rax       ; xmm2 = (2k - 1) = [ a | a]
+        vbroadcastsd ymm2, xmm2           ; ymm2 = [ xmm2 | xmm2 ] = [a,a,a,a]
 
-        ; y = y + xmm3 * xmm4
-        mulps xmm4, xmm3
-        addps xmm6, xmm4
+        vcvtsi2sd xmm3, xmm3, r11       ; xmm3 = sign = [ a | a]
+        vbroadcastsd ymm3, xmm3           ; ymm3 = [a,a,a,a]
+
+        vmulpd ymm3, ymm3, ymm2         ; ymm3 = ymm3 * ymm2
+
+        ; y = y + ymm3 * ymm0
+        vfmadd231pd ymm6, ymm3, ymm0
 
         ; k += 1
         inc r9
         jmp loop_start
 
 loop_end:
-        movaps [res_arr1], xmm6
+        vmovapd ymmword ptr [res_arr1], ymm6
         lea rax, res_arr1
         ret
     task7_3 ENDP
 
-	POW_SSE PROC
+	POW_AVX PROC
 		; USES RCX RDX XMM0 XMM1
 		; IN:
 		;	XMM0 - x
@@ -87,18 +86,18 @@ loop_end:
 
 		mov rcx, rdx
 		dec rcx
-		jz loop_end
+		jz pow_loop_end
 
-		movaps xmm1, xmm0
-	loop_start:
-		mulps xmm0, xmm1
+		vmovapd ymm1, ymm0          ; ymm1 = x
+	pow_loop_start:
+		vmulpd ymm0, ymm0, ymm1     ; ymm0 *= ymm1
 		dec rcx
-		jnz loop_start
-	loop_end:
+		jnz pow_loop_start
+	pow_loop_end:
 		ret
 
 	case_0:
-		movaps xmm0, [one]
+		vmovapd ymm0, ymmword ptr [one]
 		ret
-	POW_SSE ENDP
+	POW_AVX ENDP
 END
