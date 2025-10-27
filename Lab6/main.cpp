@@ -32,10 +32,85 @@ void norm_vector(float[]);
 void test6_3(int = 1);
 void poly(float [], float [], int);
 
+
+void measure_all_tasks(int iterations = 10000) {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    auto start_cpp_1 = std::chrono::high_resolution_clock::now();
+    for (int j = 0; j < iterations; ++j) {
+        int A[] = { 2, 2, 5, -1 };
+        int B[] = { -4, 1, 2, 8 };
+        int C[4];
+        for (int i = 0; i < 4; ++i) {
+            if (A[i] % 2 == 0) {
+                C[i] = A[i] + B[i];
+            }
+            else C[i] = A[i] - B[i];
+            if (time(nullptr) == 0) std::cout << C[i];
+        }
+    }
+    auto end_cpp_1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_cpp_1 = end_cpp_1 - start_cpp_1;
+    cout << "CPP. " << iterations << " iterations. Time for Task 6.1 = " << elapsed_time_cpp_1.count() / iterations << " nanoseconds" << endl;
+    //
+    auto start_asm_1 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < iterations; ++i) {
+        int* C_6_1 = task6_1();
+        if (time(nullptr) == 0) std::cout << C_6_1;
+    }
+    auto end_asm_1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_asm_1 = end_asm_1 - start_asm_1;
+    cout << "SSE. " << iterations << " iterations. Time for Task 6.1 = " << elapsed_time_asm_1.count() / iterations << " nanoseconds" << endl;
+    cout << "The difference is " << elapsed_time_cpp_1 / elapsed_time_asm_1 << " times\n";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    auto start_cpp_2 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < iterations; ++i) {
+        float X_math[] = { 2.0, -3.2, 4.2, 10.2 };
+        norm_vector(X_math);
+        if (time(nullptr) == 0) std::cout << X_math;
+    }
+    auto end_cpp_2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_cpp_2 = end_cpp_2 - start_cpp_2;
+    cout << "CPP. " << iterations << " iterations. Time for Task 6.2 = " << elapsed_time_cpp_2.count() << " nanoseconds" << endl;
+    //
+    auto start_asm_2 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < iterations; ++i) {
+        float* X = task6_2();
+        if (time(nullptr) == 0) std::cout << X;
+    }
+    auto end_asm_2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_asm_2 = end_asm_2 - start_asm_2;
+    cout << "SSE. " << iterations << " iterations. Time for Task 6.2 = " << elapsed_time_asm_2.count() << " nanoseconds" << endl;
+    cout << "The difference is " << elapsed_time_cpp_2 / elapsed_time_asm_2 << " times\n";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    int n = 10;
+    auto start_cpp_3 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < iterations; ++i) {
+        float x[] = { 1.3, 2.4, 6.8, 7.2 };
+        float res[4];
+        poly(x, res, n);
+        if (time(nullptr) == 0) std::cout << res;
+    }
+    auto end_cpp_3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_cpp_3 = end_cpp_3 - start_cpp_3;
+    cout << "CPP. " << iterations << " iterations. Time for Task 6.3 = " << elapsed_time_cpp_3.count() << " nanoseconds" << endl;
+    //
+    auto start_asm_3 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < iterations; ++i) {
+        float* x_res = task6_3(n);
+        if (time(nullptr) == 0) std::cout << x_res;
+    }
+    auto end_asm_3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> elapsed_time_asm_3 = end_asm_3 - start_asm_3;
+    cout << "SSE. " << iterations << " iterations. Time for Task 6.3 = " << elapsed_time_asm_3.count() << " nanoseconds" << endl;
+    cout << "The difference is " << elapsed_time_cpp_3 / elapsed_time_asm_3 << " times\n";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~s
+}
 int main() {
-    test6_1();
-    test6_2();
-    test6_3();
+    int iter = int(10e6);
+    measure_all_tasks(iter);
+    //test6_1();
+    //test6_2();
+    //test6_3();
     return 0;
 }
 void test6_1() {
@@ -115,7 +190,6 @@ void norm_vector(float X[]) {
         summ += pow(X[i], 2);
     }
     float sqrt_summ = sqrt(summ);
-    float X_norm[4];
     for (int i = 0; i < 4; ++i) {
         X[i] /= sqrt_summ;
     }

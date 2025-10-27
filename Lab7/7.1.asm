@@ -5,8 +5,8 @@
 option casemap:none
 
 DataSeg SEGMENT ALIGN(32)
-        A sdword 2, 2, 5, -1, 6, 4, -2, 1
-        B sdword -4, 1, 2, 8, 8, 12, -5, 0
+        A sqword 2, 2, 5, -1
+        B sqword -4, 1, 2, 8
         C sdword 8 DUP(?)
         one dword 8 DUP(1)
 
