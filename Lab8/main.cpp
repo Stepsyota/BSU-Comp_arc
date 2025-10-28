@@ -31,7 +31,7 @@ double measure_access_time(void**, size_t);
 
 int main() {
 	std::ofstream csv_file("cache_table.csv");
-	csv_file << "Byte size, Stride, Time, ns, Chain_type\n";
+	csv_file << "Byte_size,Stride,Time,Chain_type\n";
 
 	size_t iterations = int(10e4);
 
@@ -44,14 +44,14 @@ int main() {
 			void** linear_chain = create_linear_chain(byte_size, stride);
 			double linear_time = measure_access_time(linear_chain, iterations);
 			csv_file << byte_size << ", " << stride << ", " << linear_time << ", " << "linear\n";
-			cout << "Byte size = " << byte_size << "\t Stride = " << stride << "\t Time = " << linear_time << "\t Chain = linear" << endl;
+			cout << "Byte size = " << byte_size << "\t Stride = " << stride << "\t Time = " << linear_time << " ns,\t Chain = linear" << endl;
 			delete[] linear_chain;
 
 
 			void** random_chain = create_random_chain(byte_size, stride);
 			double random_time = measure_access_time(random_chain, iterations);
 			csv_file << byte_size << ", " << stride << ", " << random_time << ", " << "random\n";
-			cout << "Byte size = " << byte_size << "\t Stride = " << stride << "\t Time = " << linear_time << "\t Chain = random" << endl;
+			cout << "Byte size = " << byte_size << "\t Stride = " << stride << "\t Time = " << linear_time << " ns,\t Chain = random" << endl;
 			delete[] random_chain;
 			byte_size *= 2;
 		}
