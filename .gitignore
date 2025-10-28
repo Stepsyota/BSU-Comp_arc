@@ -1,6 +1,7 @@
 *.pdf
 *.docx
 *.txt
+!requirements.txt
 *.bin
 
 ## Ignore Visual Studio temporary files, build results, and
