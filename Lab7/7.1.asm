@@ -5,8 +5,8 @@
 option casemap:none
 
 DataSeg SEGMENT ALIGN(32)
-        A sqword 2, 2, 5, -1
-        B sqword -4, 1, 2, 8
+        A sdword 2, 2, 5, -1, 13, 8, -5, 2
+        B sdword -4, 1, 2, 8, -3, -2, 1 ,6
         C sdword 8 DUP(?)
         one dword 8 DUP(1)
 
@@ -28,7 +28,7 @@ DataSeg SEGMENT ALIGN(32)
     vpandn ymm7, ymm5, ymm3                        ; ymm7 = (A+B) для чётных
     vpor ymm6, ymm6, ymm7                          ; ymm7 = результат
 
-    vmovdqa ymmword ptr [C], ymm6
+    vmovaps ymmword ptr [C], ymm6
 
     lea rax, [C]
     ret

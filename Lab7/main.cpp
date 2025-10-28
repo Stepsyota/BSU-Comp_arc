@@ -23,29 +23,29 @@ using namespace std;
 
 extern "C" {
     int* task7_1();
-    double* task7_2();
-    double* task7_3(int n = 1);
+    float* task7_2();
+    float* task7_3(int n = 1);
 }
 void test7_1();
 void test7_2();
-void norm_vector(double[]);
+void norm_vector(float[]);
 void test7_3(int = 1);
-void poly(double [], double [], int);
+void poly(float[], float[], int);
 
 void measure_all_tasks(int iterations = 10000) {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto start_cpp_1 = std::chrono::high_resolution_clock::now();
     for (int j = 0; j < iterations; ++j) {
-        int A[] = { 2, 2, 5, -1 };
-        int B[] = { -4, 1, 2, 8 };
-        int C[4];
-        for (int i = 0; i < 4; ++i) {
+        volatile int A[] = { 2, 2, 5, -1, 13, 8, -5, 2 };
+        volatile int B[] = { -4, 1, 2, 8, -3, -2, 1 ,6 };
+        volatile int C[8];
+        for (int i = 0; i < 8; ++i) {
             if (A[i] % 2 == 0) {
                 C[i] = A[i] + B[i];
             }
             else C[i] = A[i] - B[i];
-            if (time(nullptr) == 0) std::cout << C[i];
         }
+        if (time(nullptr) == 0) std::cout << C[0];
     }
     auto end_cpp_1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time_cpp_1 = end_cpp_1 - start_cpp_1;
@@ -63,7 +63,7 @@ void measure_all_tasks(int iterations = 10000) {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto start_cpp_2 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; ++i) {
-        double X_math[] = { 2.0, -3.2, 4.2, 10.2 };
+        float X_math[] = { 2.0, -3.2, 4.2, 10.2, 12.3, 14.2, 3.01, 3.25 };
         norm_vector(X_math);
         if (time(nullptr) == 0) std::cout << X_math;
     }
@@ -73,7 +73,7 @@ void measure_all_tasks(int iterations = 10000) {
     //
     auto start_asm_2 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; ++i) {
-        double* X = task7_2();
+        float* X = task7_2();
         if (time(nullptr) == 0) std::cout << X;
     }
     auto end_asm_2 = std::chrono::high_resolution_clock::now();
@@ -84,8 +84,8 @@ void measure_all_tasks(int iterations = 10000) {
     int n = 10;
     auto start_cpp_3 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; ++i) {
-        double x[] = { 1.3, 2.4, 6.8, 7.2 };
-        double res[4];
+        float x[] = { 1.3, 2.4, 6.8, 7.2, 4.3, 4.2, 1.1, 0.6 };
+        float res[8];
         poly(x, res, n);
         if (time(nullptr) == 0) std::cout << res;
     }
@@ -95,7 +95,7 @@ void measure_all_tasks(int iterations = 10000) {
     //
     auto start_asm_3 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; ++i) {
-        double* x_res = task7_3(n);
+        float* x_res = task7_3(n);
         if (time(nullptr) == 0) std::cout << x_res;
     }
     auto end_asm_3 = std::chrono::high_resolution_clock::now();
@@ -110,12 +110,13 @@ int main() {
     //test7_1();
     //test7_2();
     //test7_3(5);
+    system("pause");
     return 0;
 }
 void test7_1() {
     auto start_cpp = std::chrono::high_resolution_clock::now();
-    int A[] = { 2, 2, 5, -1, 6, 4, -2, 1 };
-    int B[] = { -4, 1, 2, 8, 8, 12, -5, 0 };
+    int A[] = { 2, 2, 5, -1, 13, 8, -5, 2 };
+    int B[] = { -4, 1, 2, 8, -3, -2, 1 ,6 };
     int C[8];
 
     for (int i = 0; i < 8; ++i) {
@@ -152,7 +153,7 @@ void test7_2() {
     //
     auto start_cpp = std::chrono::high_resolution_clock::now();
 
-    double X_math[] = { 2.0, -3.2, 4.2, 10.2 };
+    float X_math[] = { 2.0, -3.2, 4.2, 10.2, 12.3, 14.2, 3.01, 3.25 };
     norm_vector(X_math);
 
     auto end_cpp = std::chrono::high_resolution_clock::now();
@@ -161,16 +162,16 @@ void test7_2() {
     //
     auto start_asm = std::chrono::high_resolution_clock::now();
 
-    double* X = task7_2();
+    float* X = task7_2();
 
     auto end_asm = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time_asm = end_asm - start_asm;
     cout << "AVX. Time for Task 7.2 = " << elapsed_time_asm.count() << " nanoseconds" << endl;
     //
 
-    double sum_X = 0;
-    double sum_X_math = 0;
-    for (int i = 0; i < 4; ++i) {
+    float sum_X = 0;
+    float sum_X_math = 0;
+    for (int i = 0; i < 8; ++i) {
         cout << fixed << setprecision(10) << "X[" << i << "] ASM/MATH.H = " << X[i] << "/" << X_math[i];
         if (round((X[i] - X_math[i]) * 10000) == 0) {
             cout << "\tEQUAL!\n";
@@ -181,13 +182,13 @@ void test7_2() {
     }
     cout << "Length of vector ASM/MATH.H = " << sqrt(sum_X) << "/" << sqrt(sum_X_math) << endl << endl;
 }
-void norm_vector(double X[]) {
-    double summ = 0;
-    for (int i = 0; i < 4; ++i) {
+void norm_vector(float X[]) {
+    float summ = 0;
+    for (int i = 0; i < 8; ++i) {
         summ += pow(X[i], 2);
     }
-    double sqrt_summ = sqrt(summ);
-    for (int i = 0; i < 4; ++i) {
+    float sqrt_summ = sqrt(summ);
+    for (int i = 0; i < 8; ++i) {
         X[i] /= sqrt_summ;
     }
 }
@@ -195,8 +196,8 @@ void test7_3(int n) {
     //
     auto start_cpp = std::chrono::high_resolution_clock::now();
 
-    double x[] = { 1.3, 2.4, 6.8, 7.2 };
-    double res[4];
+    float x[] = { 1.3, 2.4, 6.8, 7.2, 4.3, 4.2, 1.1, 0.6 };
+    float res[8];
     poly(x, res, n);
 
     auto end_cpp = std::chrono::high_resolution_clock::now();
@@ -206,13 +207,13 @@ void test7_3(int n) {
     //
     auto start_asm = std::chrono::high_resolution_clock::now();
 
-    double* x_res = task7_3(n);
+    float* x_res = task7_3(n);
 
     auto end_asm = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time_asm = end_asm - start_asm;
     cout << "AVX. Time for Task 7.3 = " << elapsed_time_asm.count() << " nanoseconds" << endl;
     //
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 8; ++i) {
         cout << fixed << setprecision(10) << "X" << i << " by ASM/FUNC = " << x_res[i] << "/" << res[i];
         if (round((x_res[i] - res[i]) * 10e5) == 0) {
             cout << " EQUAL!\n";
@@ -221,11 +222,11 @@ void test7_3(int n) {
     }
     cout << endl;
 }
-void poly(double x[], double res[], int n = 1) {
-    for (int i = 0; i < 4; ++i) {
-        double result = 10;
+void poly(float x[], float res[], int n = 1) {
+    for (int i = 0; i < 8; ++i) {
+        float result = 10;
         for (int k = 1; k <= n; ++k) {
-            double sigma = pow(-1, k + 1) * (2 * k - 1) * pow(x[i], 2 * k - 1);
+            float sigma = pow(-1, k + 1) * (2 * k - 1) * pow(x[i], 2 * k - 1);
             result += sigma;
         }
         res[i] = result;

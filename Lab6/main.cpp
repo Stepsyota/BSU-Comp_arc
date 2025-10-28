@@ -37,16 +37,16 @@ void measure_all_tasks(int iterations = 10000) {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto start_cpp_1 = std::chrono::high_resolution_clock::now();
     for (int j = 0; j < iterations; ++j) {
-        int A[] = { 2, 2, 5, -1 };
-        int B[] = { -4, 1, 2, 8 };
-        int C[4];
+        volatile int A[] = { 2, 2, 5, -1 };
+        volatile int B[] = { -4, 1, 2, 8 };
+        volatile int C[4];
         for (int i = 0; i < 4; ++i) {
             if (A[i] % 2 == 0) {
                 C[i] = A[i] + B[i];
             }
             else C[i] = A[i] - B[i];
-            if (time(nullptr) == 0) std::cout << C[i];
         }
+        if (time(nullptr) == 0) std::cout << C[0];
     }
     auto end_cpp_1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time_cpp_1 = end_cpp_1 - start_cpp_1;
@@ -111,6 +111,8 @@ int main() {
     //test6_1();
     //test6_2();
     //test6_3();
+    system("pause");
+
     return 0;
 }
 void test6_1() {
